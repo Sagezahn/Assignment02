@@ -13,7 +13,26 @@ public class ThirdPersonControllerScript : MonoBehaviour
 
     private Vector3 storedClickedPosition;
 
+    private float turnSmooth = 25f;
+
     private string GROUND = "Ground";
+
+    // In combat statut
+    public string PLAYER_STATUTS_INCOMBAT = "Combat";
+
+    // Not in combat statut
+    public string PLAYER_STATUTS_NORMAL = "Normal";
+
+    // Not in combat walking
+    public string MOVING_FUNCTION_NORMAL_WALK = "Moving";
+
+    public string MOVING_FUNCTION_RUNNING = "Running";
+
+    // check the direction which player to destination
+    public float DESTINATION_DIRECTION = 1f;
+
+    // check the direction which player to enemy
+    public float ENEMY_DIRECTION = 2F;
 
     // Start is called before the first frame update
     void Start()
@@ -56,54 +75,87 @@ public class ThirdPersonControllerScript : MonoBehaviour
              // if the ray touch to the ground
             if (Physics.Raycast(groundCheckRay, out raycastHit)) {
                 GameObject currentBlockedObject = raycastHit.collider.gameObject;
+                // if mouse clicked to the ground, player should be move to this position
                 if (currentBlockedObject.tag == GROUND) {
                     Vector3 mouseClickedPosition = raycastHit.point;
                     StoreDestinationPosition(mouseClickedPosition);
-                    Moving2Destination(mouseClickedPosition);
-                }   
+                    TakeSmoothRotation();
+                    Moving2Destination();
+                }
+                /*
+                 *  TODO
+                 *  if mouse clicked to the enemy, player should move to the enemy.
+                 *  if player near to the enemy less than 2f, player should not to move, player just could attack and defend
+                 *  when player near to enemy less than 2f, player should be in combat and change the animations
+                 */    
             }
         } else {
-            if (storedClickedPosition != Vector3.zero) {
-                Moving2Destination(storedClickedPosition);
+            if (hasStoredPosition()) {
+                Moving2Destination();
             } else {
-                animator.SetBool("Moving", false);
+                animator.SetBool(MOVING_FUNCTION_NORMAL_WALK, false);
             }
         }
         RunOrWalk();
-        if (isArrived2DestinationPosition()) {
+        // check player whether near the destination position less than 1f;
+        if (isArrived2DestinationPositionByCustomDistance(DESTINATION_DIRECTION)) {
             RemoveDestinationPosition();
         }
+    }
+
+    /*
+     *  Instead of the LookAt function, 
+     *  this function will help player turn to new destination smoothly
+     */
+    private void TakeSmoothRotation() {
+        
+        Quaternion oldRotation = transform.rotation;
+        transform.LookAt(storedClickedPosition);
+        Quaternion newRotation = transform.rotation;
+        transform.rotation = oldRotation;
+        transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, turnSmooth * Time.deltaTime);
+    }
+
+    // Checking the new destination or had
+    private bool hasStoredPosition() {
+
+        if (storedClickedPosition != Vector3.zero) {
+            return true;
+        }
+        return false;
     }
 
     // if push left shift, player should run
     private void RunOrWalk() {
         if (Input.GetKeyDown(KeyCode.LeftShift)) {
-           animator.SetBool("Running", true);
+           animator.SetBool(MOVING_FUNCTION_RUNNING, true);
            speed = 5f;
         } else if (Input.GetKeyUp(KeyCode.LeftShift)) {
-           animator.SetBool("Running", false);
+           animator.SetBool(MOVING_FUNCTION_RUNNING, false);
            speed = 2f;
         }
     }
 
     // moving function
-    private void Moving2Destination(Vector3 destinationPosition) {
+    private void Moving2Destination() {
 
-        transform.LookAt(destinationPosition);
+        // transform.LookAt(storedClickedPosition);
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        animator.SetBool("Moving", true);
+        animator.SetBool(MOVING_FUNCTION_NORMAL_WALK, true);
     }
 
+    
+
     // check the current player whether arrived to the destination position
-    private bool isArrived2DestinationPosition() {
+    private bool isArrived2DestinationPositionByCustomDistance(float customDistance) {
 
         // should use approximate position because the step will not follow the position, it will have 0-1 error
         // if (transform.position.x == storedClickedPosition.x && transform.position.z == storedClickedPosition.z) {
         //     return true;
         // }
-        // use distance to check the position
+        // this is new function to check, use distance to check the position
         float destinationDistance = Vector3.Distance(transform.position, storedClickedPosition);
-        if (destinationDistance < 1f) {
+        if (destinationDistance < customDistance) {
             return true;
         }
         return false;
