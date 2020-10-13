@@ -38,6 +38,7 @@
   <ItemGroup>
      <Compile Include="Assets\ThirdPersonControllerScript.cs" />
      <Compile Include="Assets\C&amp;C_Pack\Goblin_rouge\Script\Goblin_ro_ctrl.cs" />
+     <None Include="Assets\QS\QS-Textures-Grass-v1\Documentation\Readme.txt" />
      <None Include="Assets\C&amp;C_Pack\Goblin_rouge\readme.txt" />
     <Reference Include="UnityEngine">
         <HintPath>C:/Program Files/Unity/Hub/Editor/2020.1.7f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
