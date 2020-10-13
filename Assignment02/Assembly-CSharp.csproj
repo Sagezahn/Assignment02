@@ -38,6 +38,7 @@
   <ItemGroup>
      <Compile Include="Assets\ThirdPersonControllerScript.cs" />
      <Compile Include="Assets\C&amp;C_Pack\Goblin_rouge\Script\Goblin_ro_ctrl.cs" />
+     <Compile Include="Assets\CamFellow.cs" />
      <None Include="Assets\QS\QS-Textures-Grass-v1\Documentation\Readme.txt" />
      <None Include="Assets\C&amp;C_Pack\Goblin_rouge\readme.txt" />
     <Reference Include="UnityEngine">
