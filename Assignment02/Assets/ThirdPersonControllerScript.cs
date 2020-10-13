@@ -118,7 +118,7 @@ public class ThirdPersonControllerScript : MonoBehaviour
 
     // Checking the new destination or had
     private bool hasStoredPosition() {
-
+        
         if (storedClickedPosition != Vector3.zero) {
             return true;
         }
